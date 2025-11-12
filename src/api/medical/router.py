@@ -1,24 +1,47 @@
 from fastapi import APIRouter
-
-from src.api.medical.deps import MedicalServiceDep
-from src.api.medical.dto import GetMedicalInfoRequestDto
+from src.api.medical.dto.all_dto import AllResult
+from src.api.medical.dto.base_dto import ChartTermRequestDto
+from src.api.medical.dto.progress_note_dto import ProgressNoteResult, SummarizeProgressNoteRequestDto
+from src.api.medical.graphs import medical_graph
+from src.api.medical.service import MedicalServiceDep
 
 router = APIRouter(prefix="/medical", tags=["medical"])
 
 
-@router.post("/info")
-async def get_medical_info(
-    dto: GetMedicalInfoRequestDto,
+@router.post("/progress-note/summarize", response_model=ProgressNoteResult)
+async def summarize_progress_note(
+    dto: SummarizeProgressNoteRequestDto,
     service: MedicalServiceDep
 ):
   """
-  의료 정보 조회 엔드포인트
-
-  Args:
-      dto: 의료 정보 조회 요청 DTO
-      service: MedicalService (의존성 주입)
-
-  Returns:
-      의료 정보 응답
+  경과기록 요약
   """
-  return await service.get_medical_info(dto)
+  return await service.summarize_progress_note(dto)
+
+
+@router.post("/vs")
+async def vs(
+    dto: ChartTermRequestDto,
+    service: MedicalServiceDep
+):
+  return await service.vs_summary(dto)
+
+
+@router.post("/all", response_model=AllResult)
+async def all_summary(
+    dto: ChartTermRequestDto,
+    service: MedicalServiceDep
+):
+  result = await medical_graph.workflow.ainvoke({
+      'input': {
+          'chart': dto.chart,
+          'symd': dto.symd,
+          'eymd': dto.eymd
+      },
+      'session': service.session
+  })
+
+  return AllResult(
+      progress_notes_summary=result['progress_notes_summary'],
+      vs_ns_summary=result['vs_ns_summary']
+  )
