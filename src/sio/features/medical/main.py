@@ -1,11 +1,8 @@
 """의료 관련 네임스페이스"""
-import json
-from src.api.medical.dto.progress_note_dto import ProgressNoteResult
-from src.api.medical.service import VsNsSummaryResult
 from src.sio.config import sio
 from src.sio.base import BaseNamespace
 from src.sio.features.medical import medical_graph
-from src.sio.features.medical.dto import SummarizePatientRequest
+from src.sio.features.medical.dto import PatientSummaryResponse, ProgressNoteResult, SummarizePatientRequest, VsNsSummaryResult
 
 
 class MedicalNamespace(BaseNamespace):
@@ -58,16 +55,19 @@ class MedicalNamespace(BaseNamespace):
           }
       })
       # room의 모든 클라이언트로부터 응답 수집
-      
+
       # Pydantic 모델을 dict로 변환 (JSON 직렬화 가능)
-      progress_notes_summary : ProgressNoteResult = result['progress_notes_summary']
-      vs_ns_summary : VsNsSummaryResult = result["vs_ns_summary"]
-      
-      new_data = {
-          "progressNotesSummary": progress_notes_summary.model_dump(by_alias=True),
-          "vsNsSummary": vs_ns_summary.model_dump(by_alias=True), 
-      }
-      responses = await self.emit_with_ack("summarize_patient", new_data, to=to)
+      progress_notes_summary: ProgressNoteResult = result['progress_notes_summary']
+      vs_ns_summary: VsNsSummaryResult = result["vs_ns_summary"]
+
+      response = PatientSummaryResponse(
+          progress_notes_summary=progress_notes_summary,
+          vs_ns_summary=vs_ns_summary
+      )
+      responses = await self.emit_with_ack(
+          "summarize_patient",
+          response.model_dump(by_alias=True),
+          to=to)
 
       await self.emit("loading", {"status": "done"}, room=to)
       print(f"[{self.namespace}] room 응답 결과: {responses}")

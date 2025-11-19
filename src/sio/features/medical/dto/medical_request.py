@@ -33,8 +33,33 @@ class VitalSign(TypedDict):
   spo2: str            # 산소포화도
 
 
+class DiagnosisDetail(TypedDict):
+  icdCode: str
+  diagnosisName: str
+
+
+class DiagnosisRecord(TypedDict):
+  ymd: str
+  diagnoses: list[DiagnosisDetail]
+
+
+class Medication(TypedDict):
+  sYmd: str                    # 투약 시작일
+  eYmd: str                    # 투약 종료일
+  medicationYmds: list[str]    # 투약 세부 일자
+  medicationName: str          # 약품명
+  route: str                   # 투여 경로
+  dose: float                  # 1회 투약량
+  frequency: int               # 횟수
+  totalDays: int               # 총투여일수
+  administration: str          # 용법
+  note: str                    # 참고사항
+
+
 class SummarizePatientRequest(TypedDict):
   patientInfo: PatientInfo
   nursingRecords: list[NursingRecord]
   progressNotes: list[ProgressNote]
   vitalSigns: list[VitalSign]
+  medications: list[Medication]
+  diagnosisRecords: list[DiagnosisRecord]

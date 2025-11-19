@@ -5,13 +5,11 @@ from langchain.messages import HumanMessage
 from langgraph.func import END, START
 from langgraph.graph import StateGraph
 
-from src.api.medical.dto.progress_note_dto import ProgressNoteResult
-from src.api.medical.dto.vs_ns_dto import VsNsSummaryResult
 from src.constants import llm_models
 
 from src.utils.format_util import hm_to_time, ymd_to_date
 
-from src.sio.features.medical.dto import ProgressNote, VitalSign, NursingRecord
+from src.sio.features.medical.dto import ProgressNote, ProgressNoteResult, VitalSign, NursingRecord, VsNsSummaryResult
 from src.sio.features.medical.models import NsModels, VsModel, VsModels
 
 

@@ -85,3 +85,10 @@ class ClinicalPrediction(CarmelModel):
   rationale: str = Field(..., description="예측 근거 요약 (활력징후 추이, 행동 패턴, 과거 이력 등)")
   recommended_action: str = Field(...,
                                   description="권장 선제적 조치 (예: 약물 증량, 1:1 관찰, 외진 예약)")
+
+
+class PatientSummaryResponse(CarmelModel):
+  progress_notes_summary: ProgressNoteResult = Field(
+      ..., description="경과기록 요약 정보")
+  vs_ns_summary: VsNsSummaryResult = Field(
+      ..., description="활력징후 및 간호기록 요약 정보")
